@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Aniversário de Namoro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffe6f0;
+            color: #ff66a3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .question-container {
+            display: none;
+            border: 2px solid #ff99c2;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+        }
+        .question {
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .options button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            background-color: #ffb3d1;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .options button:hover {
+            background-color: #ff66a3;
+            color: #fff;
+        }
+        .celebration-message {
+            display: none;
+            font-size: 1.2em;
+            color: #ff66a3;
+        }
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            background-color: #fff;
+            border: 3px solid #ff99c2;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 10;
+        }
+        #popup button {
+            padding: 10px;
+            background-color: #ff66a3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #finalStep {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            border: 2px solid #ff99c2;
+        }
+        #finalStep input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ff99c2;
+        }
+        #finalStep button {
+            background-color: #ff66a3;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>2 Anos de Amor ❤️ <br>Matheus & Gabi</h1>
+        <div id="step1" class="question-container">
+            <p class="question">Pergunta 1: Onde foi nosso primeiro encontro?</p>
+            <div class="options">
+                <button onclick="checkAnswer(1, false)">Bar</button>
+                <button onclick="checkAnswer(1, true)">Cinema</button>
+                <button onclick="checkAnswer(1, false)">Calourada</button>
+            </div>
+        </div>
+        <div id="step2" class="question-container">
+            <p class="question">Pergunta 2: Qual nossa comida favorita?</p>
+            <div class="options">
+                <button onclick="checkAnswer(2, true)">Cookies</button>
+                <button onclick="checkAnswer(2, false)">Smores</button>
+                <button onclick="checkAnswer(2, false)">Petit four</button>
+            </div>
+        </div>
+
+        <p class="celebration-message" id="celebrate">Parabéns, você acertou! 🎉</p>
+
+        <div id="popup">
+            <p>Você acertou!</p>
+            <img src="" alt="">
+            <button onclick="closePopup()">Fechar</button>
+        </div>
+
+        <div id="finalStep">
+            <p>Parabéns! Você completou o quiz! 🎉</p>
+            <p>Digite seu e-mail e número para receber o cronograma:</p>
+            <input type="email" id="email" placeholder="Seu e-mail" required>
+            <input type="tel" id="phone" placeholder="Seu número de telefone" required>
+            <button onclick="submitForm()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function showStep(step) {
+            document.querySelectorAll('.question-container').forEach(q => q.style.display = 'none');
+            document.getElementById('step' + step).style.display = 'block';
+        }
+
+        function checkAnswer(step, isCorrect) {
+            if (isCorrect) {
+                document.getElementById('celebrate').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('celebrate').style.display = 'none';
+                    showPopup();
+                    nextStep();
+                }, 1000);
+            } else {
+                alert('Tente novamente!');
+            }
+        }
+
+        function showPopup() {
+            document.getElementById('popup').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        function nextStep() {
+            currentStep++;
+            if (currentStep === 2) {
+                showStep(currentStep);
+            } else {
+                showFinalStep();
+            }
+        }
+
+        function showFinalStep() {
+            document.querySelectorAll('.question-container').forEach(q => q.style.display = 'none');
+            document.getElementById('finalStep').style.display = 'block';
+        }
+
+        async function submitForm() {
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+
+            if (email && phone) {
+                try {
+                    const response = await fetch('https://n8n.tellesfreire.com.br/webhook-test/mensagem-gabi', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, phone })
+                    });
+                    
+                    if (response.ok) {
+                        alert(`Obrigado! O cronograma será enviado para ${email}.`);
+                    } else {
+                        alert("Erro ao enviar os dados. Tente novamente mais tarde.");
+                    }
+                } catch (error) {
+                    console.error("Erro:", error);
+                    alert("Erro ao conectar com o servidor.");
+                }
+            } else {
+                alert("Por favor, preencha ambos os campos.");
+            }
+        }
+
+        // Inicializar o quiz
+        showStep(currentStep);
+    </script>
+</body>
+</html>
